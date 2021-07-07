@@ -1,0 +1,162 @@
+
+			
+				Cazan Bogdan-Marian 313CB
+
+				  TEMA I Metode Numerie
+
+	Pentru realizarea acestei teme, am implementat fiecare functie necesara;
+in continuare, voi prezenta fiecare functie in parte:
+		
+		TASK I
+	Functii folosite: csr_multiplication, Jacobi_factorization, Jacobi_sparse,
+matrix_to_csr, generate_probabilities_system.
+  
+  ->csr_multiplication : functie primita din cadrul skeletului de cod, nu este
+implemetata de mine, nu o discut;
+
+  ->generate_probabilities_system : functie care returneaza matricea A obtinuta din
+recurentele probabilitatilor. Asa cum am spus in cadrul codului, voi explica modul
+de gandire: primul element va avea mereu aceeasi forma, prin urmare il vom
+initializa inca de la inceput. Pentru ultima linie din labirint avem conditie
+speciala, asa ca o vom lasa la urma. O celula "marginala"(fie stanga, fie dreapta),
+are o forma dedusa din vecinii acestuia unul stanga/dreapta, unul sus si 2 jos.
+O celula din interior, in schimb, are 2 vecini sus, cate unul in stanga si dreapta,
+si 2 vecini jos. Ultima linie nu respecta aceste reguli, intrucat nu mai exista
+elemente vecine in josul unei celule.
+
+  ->Jacobi_factorization : functie care calculeaza matricea si vectorul de iteratie
+a unei matrice A cu vectorul coloana b, dupa formula bine cunoscuta, nimic special;
+am folosit formulele gasite in laboratorul de metode iterative.
+
+  ->Jacobi_sparse : functie care primeste ca parametri matricea de iteratie Jacobi
+sub forma CSR si vectorul de iteratie Jacobi si calculeaza solutiile sistemului
+prin respectiva metoda. Se foloseste pentru inmultirea matricei de iteratie cu
+un anumit functia ajutatoare csr_multiplication.
+
+  ->matrix_to_csr : functie  care realizeaza inmultirea unei matrice sub forma CSR
+cu un vector folosind algoritmul dat in enuntul problemei.
+
+
+		TASK II
+	Functii folosite: clustering_pc si compute_cost_pc.
+
+  ->clustering_pc : functie care realizeaza operatia de clusterizare, urmand
+pasii din cadrul enuntului primit. Prin urmare, se creeaza NC clustere si
+centroizi care sa respecte regula data in enunt, si apoi, intr-un loop, pana se
+ajunge la solutie, se vor efectua urmatorii pasi: initializarea a NC grupuri care
+sa contina fiecare centroidul specific ei, apoi se vor adauga punctele in fiecare
+dintre aceste liste, in functie de cat de aproape se afla de fiecare centroid
+(pentru fiecare punct se calculeaza distanta fata de fiecare centroid, si pentru
+punctul a carui distanta este minima, acesta va fi adaugat in lista care contine
+respectivul centroid), dupa care vom recalcula poztiile fiecarui centroid(ca centre
+de masa ale unui cluster), acesta fiind ultimul pas din cadrul loop-ului.
+
+  ->compute_cost_pc : functie care calculeaza costul minim al celor NC clustere,
+prin calcularea distantei dintre fiecare punct aflat in fiecare cluster cu
+centroidul clusterului respectiv. Suma tuturor distantelor va fi costul cautat.
+
+	OBS : pentru calcularea distantelor am folosit functia "norm", intrucat
+nu cunosteam pentru fiecare punct in parte dimensiunea spatiului in care se afla,
+prin urmare nu puteam face DIRECT cu formula clasica de la geometrie(se putea face,
+dar ar fi redus mult din eficienta, intr-un mod inutil).
+
+
+		TASK III
+	Functii folosite in cadrul rezolvarii acestui task: rgbHistogram,
+hsvHistogram, My_own_rgb2hsv, getImgNames, Householder, SST, preprocess, learn
+si evaluate.
+
+  ->rgbHistogram : citim imaginea folosind functia imread, pentru a o putea
+interpreta in cod, dupa care, folosind functia histc, vom obtine valorile necesare
+pentru realizarea histogramei. Acest lucru a fost efectuat asupra fiecarui cod de
+culoare, adica pentru R, G si respectiv B. Rezultatul este, de sigur, histograma
+obtinuta prin concatenarea celor 3 vectori rezultate din cele 3 coduri de culoare.
+
+  ->hsvHistogram : Exact acelasi proces ca la rgbHistogram, cu mentiunea ca mai
+intai vom obtine imaginea in format hsv, folosind functia de conversie implementata
+de mine, pornind de la algoritmul prezentat in enunt.
+
+  ->My_own_rgb2hsv : Asa cum am mentionat mai sus, pentru hsvHistogram facem
+conversia pozei din format rbg in format hsv. In enunt, algoritmul a fost aplicat
+aspura unui singur pixel. Pentru a eficientiza aceasta conversie, am aplicat
+direct algoritmul asupra intregii imagini, si pentru a "grabi" si mai repede 
+procesul, am folosit exclusiv numai vectorizari. Prin urmare, am format cate
+o matrice pentru C_max, C_min si delta, in loc sa volosim variabile de dimensiune
+1x1. Apoi nu am facut decat sa adaptez formulele din enunt (am observat ca multe
+chestii se repetau fara motiv; spre exemplu, acele if-uri necesare obtinerii lui H
+erau verificate de fiecare data, fara rost, un simplu if-else reducand mult timpul
+de executie). Toate aceste chestii le-am facut in special pentru rezolvarea
+tasku-lui 4, care necesita o viteza de executie NEBUNA. Prin urmare, am facut toate
+aceste precizari pentru a nu le mai relua si la descrierea ultimului task.
+
+  ->getImgNames : aceasta functie a fost luata din cadrul checkerului primit, insa
+am avut nevoie de aceasta in cadrul functiilor preprocess si evaluate. Am facut
+mici modificari de coding-style si cateva comentarii in plus, dar nimic in rest.
+
+  ->Householder : algoritm luat de pe site-ul facultatii, algoritm pe care l-am
+facut de asemenea si la laborator, nu vad ce ar fi in neregula cu el.
+
+  ->SST : functie luata tot dintr-un laborator sau curs(nu mai stiu exact) care
+rezolva un sistem superior truinghiular. Functia merge si pentru matrici
+nepatratice, singura problema fiind atunci cand avem mai multe coloane decat linii.
+
+  ->preprocess : functie care ia fiecare poza dintr-un folder cu poze cu pisici,
+respectiv dintr-un alt folder cu poze fara pisici, aplica functiile de obtinere
+a histogramelor dorite(RGB sau HSV) si va pune fiecare histograma obtinuta intr-o
+matirce X, pe care o vom folosi si la functia de learn. De asemenea, se
+initializeaza si y conform enuntului.
+
+  ->learn : functia care il "invata" pe w, rezolvand sistemul cu ajutorul functiilor
+Householder si SST (prima pentru obtinerea unei matrice superior triunghiulara,
+iar ultima pentru rezolvarea sistemului propriu zis).
+
+  ->evaluate : functie care, in principiu, face acelasi lucru ca la preprocess, cu
+o verificare in plus, si anume verificarea daca este poza cu pisici sau nu.
+Daca pentru o poza care se afla intr-o poza cu pisici da y => 0, atunci percentage
+va creste, altfel nu. Daca insa avem o poza care nu se afla o pisica si ne 
+rezulta ca y < 0, atunci percentage va creste din nou, altfel nu. La final de tot,
+vom imparti numarul de poze pentru care s-a facut o predictie buna la numarul total
+de poze pentru care s-a facut respectiva verificare. Rezultatul final va fi 
+percentage-ul obtinut(scalat evident, intre 0 si 1, numar real).
+
+
+		TASK IV
+	Functii folosite in cadrul rezolvarii acestui task: rgbHistogram,
+hsvHistogram, My_own_rgb2hsv, getImgNames, preprocess, learn si evaluate.
+
+	Pentru a scurta cat mai mult acest README, vom face mentinoarea ca
+toate functiile, mai putin learn, sunt identice cu cele de la task 3.
+	Prin urmare, daca doriti sa aflati ce face fiecare functie, recititi
+ce am scris task 3 (sau citi =) ).
+
+	Functia de learn respecta in totalitate algoritmul descris in cadrul
+enuntului. Asadar, initializam batch si alte variabile de care vom avea nevoie
+la inceputul functiei, vom genera un w random, insa ale carui elemnte vor fi valori
+reale din intervalul [-0.1 0.1], apoi vom scala matricea X, asa cum ni se spune,
+urmand ca mai apoi sa invatam pe w dupa acea formula absolut MAGICA din enunt.
+
+	O ultima observatie legata de functia evaluate, ea este 99% identica cu
+cea de la task 3, cu mentionarea ca matricea X a fost si ea scalata dupa formula
+data in enuntul temei.
+
+	GATA !!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
